@@ -35,7 +35,7 @@ function App() {
           placeholder="Enter a task"
           required
         />
-        <button type="submit">Add</button>
+        <button type="submit">Add Task</button>
       </form>
       <ul>
         {tasks.map((task) => (
