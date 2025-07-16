@@ -1,10 +1,15 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
-const port = 5001;
+const port = process.env.PORT;
+import connectDB from "./config/db.js";
 
 app.use(cors());
 app.use(express.json());
+
+connectDB();
 
 let tasks = [];
 
