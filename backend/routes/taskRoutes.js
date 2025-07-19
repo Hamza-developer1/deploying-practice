@@ -5,14 +5,22 @@ import {
   updateTask,
   deleteTask,
   toggleTaskCompletion,
+  getTaskAnalytics,
+  getTaskStats,
 } from "../controllers/taskController.js";
+import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.route("/").get(getTasks).post(createTask);
+// Analytics routes (must be before /:id routes)
+router.get("/analytics", protect, getTaskAnalytics);
+router.get("/stats", protect, getTaskStats);
 
-router.route("/:id").put(updateTask).delete(deleteTask);
+// Standard CRUD routes
+router.route("/").get(protect, getTasks).post(protect, createTask);
 
-router.patch("/:id/toggle", toggleTaskCompletion);
+router.route("/:id").put(protect, updateTask).delete(protect, deleteTask);
+
+router.patch("/:id/toggle", protect, toggleTaskCompletion);
 
 export default router;

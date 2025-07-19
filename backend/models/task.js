@@ -21,6 +21,11 @@ const taskSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt
