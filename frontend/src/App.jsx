@@ -1,48 +1,63 @@
-import { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import Tasks from "./pages/Tasks";
+
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" />;
+}
+
+function PublicRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/tasks" /> : children;
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          <ProtectedRoute>
+            <Tasks />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+}
 
 function App() {
-  const [tasks, setTasks] = useState([]);
-  const [text, setText] = useState("");
-
-  useEffect(() => {
-    fetch("/api/tasks")
-      .then((res) => res.json())
-      .then((data) => setTasks(data));
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const res = await fetch(
-      "https://deploying-practice.onrender.com/api/tasks",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      }
-    );
-    const newTask = await res.json();
-    setTasks([...tasks, newTask]);
-    setText("");
-  };
-
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>My Tasks</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Enter a task"
-          required
-        />
-        <button type="submit">Add Task</button>
-      </form>
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>{task.text}</li>
-        ))}
-      </ul>
-    </div>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
 
